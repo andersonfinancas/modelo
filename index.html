@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>FinConsult</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fff;color:#1a1a2e;max-width:500px;margin:0 auto;padding-bottom:30px;-webkit-tap-highlight-color:transparent}
+.hdr{background:#1a1a2e;color:#fff;padding:12px 10px;text-align:center;position:sticky;top:0;z-index:100}
+.hdr h1{font-size:16px;margin-bottom:6px;letter-spacing:1px}
+.yr-nav{display:flex;justify-content:center;gap:5px;margin-bottom:8px;align-items:center;flex-wrap:wrap}
+.yr-btn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:5px 14px;border-radius:14px;font-size:13px;cursor:pointer;transition:.2s}
+.yr-btn.act{background:rgba(255,255,255,.4);font-weight:700}
+.yr-add{background:rgba(39,174,96,.5);font-size:16px;padding:4px 10px;border-radius:14px;border:none;color:#fff;cursor:pointer}
+.yr-del{background:rgba(231,76,60,.5);font-size:12px;padding:5px 9px;border-radius:14px;border:none;color:#fff;cursor:pointer}
+.mo-nav{display:flex;align-items:center;justify-content:center;gap:15px}
+.mo-nav button{background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding:2px 10px}
+.mo-nav span{font-size:15px;font-weight:600;min-width:140px;text-align:center}
+.chart-box{padding:10px 8px;background:#f8f9fa;border-bottom:1px solid #eee}
+.chart-ttl{font-size:12px;font-weight:600;text-align:center;margin-bottom:4px}
+.chart{display:flex;gap:1px}
+.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.chart-evt{font-size:6px;height:13px;text-align:center;white-space:nowrap;overflow:hidden;line-height:13px}
+.chart-top{height:30px;width:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.chart-line{height:1px;width:100%;background:#bbb}
+.chart-bot{height:30px;width:100%;display:flex;flex-direction:column;justify-content:flex-start;align-items:center}
+.chart-bar{width:70%;border-radius:2px;min-height:1px;transition:height .3s}
+.bar-g{background:#27ae60}
+.bar-r{background:#e74c3c}
+.bar-proj{opacity:.3}
+.bar-cur{outline:2px solid #f39c12;outline-offset:-1px}
+.chart-lbl{font-size:8px;color:#888;margin-top:1px}
+.chart-res{text-align:center;margin-top:6px;font-size:11px;color:#555}
+.summ{padding:10px 12px;border-bottom:1px solid #eee}
+.summ-row{display:flex;gap:6px;margin-bottom:6px}
+.summ-card{flex:1;background:#f8f9fa;border-radius:6px;padding:8px}
+.summ-card .lb{font-size:9px;color:#888;text-transform:uppercase}
+.summ-card .vl{font-size:15px;font-weight:700}
+.summ-rem{text-align:center;padding:10px;border-radius:6px;font-weight:700}
+.summ-rem .lb{font-size:10px;opacity:.7}
+.summ-rem .rv{font-size:20px}
+.summ-alert{text-align:center;font-size:11px;margin-top:6px;padding:6px;border-radius:6px}
+.sec{padding:8px 12px 4px}
+.sec-t{font-size:13px;font-weight:600;margin-bottom:6px}
+.item{display:flex;align-items:center;padding:9px;border-radius:6px;background:#f8f9fa;margin-bottom:4px;transition:.2s}
+.item.dn{opacity:.4}
+.item.dn .iname{text-decoration:line-through}
+.ichk{width:22px;height:22px;border:2px solid #ccc;border-radius:50%;margin-right:8px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;transition:.2s}
+.ichk.on{background:#27ae60;border-color:#27ae60;color:#fff}
+.iinf{flex:1;min-width:0}
+.iname{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.idet{font-size:10px;color:#888}
+.ival{font-size:13px;font-weight:700;margin-left:6px;white-space:nowrap}
+.ival.ig{color:#27ae60}
+.ival.ir{color:#e74c3c}
+.iact{display:flex;gap:1px;margin-left:4px}
+.iact button{background:none;border:none;font-size:14px;cursor:pointer;padding:3px}
+.sep{text-align:center;font-size:11px;color:#aaa;margin:8px 0 4px;padding-top:6px;border-top:1px dashed #ddd}
+.add-row{display:flex;gap:8px;padding:10px 12px}
+.add-b{flex:1;padding:10px;border:2px dashed #ddd;border-radius:6px;background:none;font-size:13px;cursor:pointer;color:#666}
+.add-b:active{background:#f5f5f5}
+.pdf-row{display:flex;gap:8px;padding:5px 12px 20px}
+.pdf-b{flex:1;padding:10px;border:none;border-radius:6px;background:#1a1a2e;color:#fff;font-size:13px;cursor:pointer;font-weight:600}
+.pdf-b:active{opacity:.7}
+.mbg{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:200;justify-content:center;align-items:center}
+.mbg.show{display:flex}
+.mdl{background:#fff;border-radius:10px;padding:16px;width:88%;max-width:360px;max-height:85vh;overflow-y:auto}
+.mdl h3{margin-bottom:12px;font-size:16px}
+.mdl label{display:block;font-size:11px;color:#666;font-weight:600;margin-bottom:3px}
+.mdl input,.mdl select{width:100%;padding:9px;border:1px solid #ddd;border-radius:6px;font-size:15px;margin-bottom:10px;-webkit-appearance:none;appearance:none}
+.mdl-btns{display:flex;gap:8px;margin-top:8px}
+.mdl-btns button{flex:1;padding:10px;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer}
+.bsv{background:#1a1a2e;color:#fff}
+.bcn{background:#f0f0f0;color:#333}
+.bdl{background:#e74c3c;color:#fff}
+.tgl-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.tgl{width:44px;height:24px;background:#ddd;border-radius:12px;position:relative;cursor:pointer;transition:.3s;flex-shrink:0}
+.tgl.on{background:#27ae60}
+.tgl::after{content:'';position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:2px;left:2px;transition:.3s}
+.tgl.on::after{left:22px}
+.help{padding:15px;background:#f0f7ff;margin:10px 12px;border-radius:8px;font-size:12px;color:#333;line-height:1.5}
+.help h4{font-size:14px;margin-bottom:8px;color:#1a1a2e}
+.help ul{padding-left:18px}
+.help li{margin-bottom:4px}
+.pdf-opt{text-align:center;margin-bottom:10px}
+.pdf-opt button{padding:10px 20px;margin:5px;border:2px solid #1a1a2e;border-radius:8px;background:#fff;color:#1a1a2e;font-size:14px;font-weight:600;cursor:pointer}
+.pdf-opt button:active{background:#1a1a2e;color:#fff}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+<h1>💰 FINCONSULT</h1>
+<div class="yr-nav" id="yrNav"></div>
+<div class="mo-nav">
+<button onclick="prevMonth()">‹</button>
+<span id="moLbl"></span>
+<button onclick="nextMonth()">›</button>
+</div>
+</div>
+
+<div class="chart-box">
+<div class="chart-ttl" id="chTtl"></div>
+<div class="chart" id="ch"></div>
+<div class="chart-res" id="chRes"></div>
+</div>
+
+<div class="summ" id="summ"></div>
+
+<div class="help" id="helpBox">
+<h4>👋 Bem-vindo ao FinConsult!</h4>
+<p>Este app te ajuda a controlar suas finanças. Abaixo estão dados de <b>exemplo</b> para você entender como funciona.</p>
+<ul>
+<li><b>Edite os valores</b> — toque no ✏️ para ajustar</li>
+<li><b>Exclua</b> o que não se aplica a você</li>
+<li><b>Adicione</b> suas receitas e contas reais</li>
+<li><b>Marque como pago</b> ✅ conforme pagar</li>
+<li><b>Recorrente</b> 🔄 repete todo mês automaticamente</li>
+<li><b>Gere PDF</b> 📄 para guardar um backup</li>
+<li><b>Navegue entre meses</b> com as setas ‹ ›</li>
+</ul>
+<p style="margin-top:8px">💡 <b>Dica:</b> comece excluindo tudo e cadastrando suas contas reais!</p>
+<button onclick="document.getElementById('helpBox').style.display='none'" style="margin-top:8px;padding:6px 16px;border:1px solid #1a1a2e;border-radius:6px;background:#fff;cursor:pointer;font-size:12px">Entendi! ✅</button>
+</div>
+
+<div id="content"></div>
+<div class="add-row">
+<button class="add-b" onclick="openModal('r')">+ Receita</button>
+<button class="add-b" onclick="openModal('e')">+ Conta</button>
+</div>
+<div class="pdf-row">
+<button class="pdf-b" onclick="openPdf()">📄 Gerar PDF</button>
+</div>
+
+<div class="mbg" id="mBg">
+<div class="mdl">
+<h3 id="mTtl"></h3>
+<label>Nome</label>
+<input type="text" id="mNm" placeholder="Ex: Salário">
+<label>Valor (R$)</label>
+<input type="number" id="mVl" placeholder="0.00" step="0.01" inputmode="decimal">
+<label>Dia do vencimento</label>
+<input type="number" id="mDy" placeholder="1-31" min="1" max="31" inputmode="numeric">
+<div class="tgl-row">
+<div class="tgl" id="mRec" onclick="this.classList.toggle('on')"></div>
+<span style="font-size:13px">Recorrente (repete todo mês)</span>
+</div>
+<div class="mdl-btns">
+<button class="bcn" onclick="closeM()">Cancelar</button>
+<button class="bdl" id="bDel" style="display:none" onclick="delItem()">Excluir</button>
+<button class="bsv" onclick="saveM()">Salvar</button>
+</div>
+</div>
+</div>
+
+<div class="mbg" id="yBg">
+<div class="mdl">
+<h3 id="yTtl"></h3>
+<label id="yLbl">Ano</label>
+<input type="number" id="yInp" placeholder="Ex: 2029" inputmode="numeric">
+<div class="mdl-btns">
+<button class="bcn" onclick="closeY()">Cancelar</button>
+<button class="bsv" id="yBtn" onclick="confirmY()">Confirmar</button>
+</div>
+</div>
+</div>
+
+<div class="mbg" id="cBg">
+<div class="mdl">
+<h3>⚠️ Tem certeza?</h3>
+<p id="cMsg" style="font-size:14px;margin-bottom:12px;color:#555"></p>
+<div class="mdl-btns">
+<button class="bcn" onclick="closeC()">Não</button>
+<button class="bdl" onclick="execC()">Sim, excluir</button>
+</div>
+</div>
+</div>
+
+<div class="mbg" id="pBg">
+<div class="mdl">
+<h3>📄 Gerar PDF</h3>
+<p style="font-size:13px;color:#555;margin-bottom:12px">Escolha o tipo de relatório:</p>
+<div class="pdf-opt">
+<button onclick="genPdf('month')">📅 Mês Atual</button>
+<button onclick="genPdf('year')">📊 Ano Inteiro</button>
+</div>
+<div class="mdl-btns">
+<button class="bcn" onclick="closePdf()">Cancelar</button>
+</div>
+</div>
+</div>
+
+<script>
+var MF=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+var MC=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+var EV={};
+var D,eId=null,eType='',mType='',yMode='',cFn=null;
+
+function ld(){try{var s=localStorage.getItem('fc5modelo');return s?JSON.parse(s):null}catch(e){return null}}
+function sv(){try{localStorage.setItem('fc5modelo',JSON.stringify(D))}catch(e){}}
+function ip(y,m){var now=new Date();return y<now.getFullYear()||(y===now.getFullYear()&&m<(now.getMonth()+1))}
+function nid(){return D.ni++}
+function mk(y,m){return y+'-'+m}
+function fmt(v){var a=Math.abs(v);var s=a.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');return v<0?'-R$ '+s:'R$ '+s}
+
+function init(){
+D=ld();
+if(!D){
+var now=new Date();var cy=now.getFullYear();var cm=now.getMonth()+1;
+D={yrs:[cy],vy:cy,vm:cm,ni:1,mo:{},rc:{r:[
+{n:'💼 Salário',v:3500,d:5},
+{n:'💰 Renda Extra',v:500,d:20}
+],e:[
+{n:'🏠 Aluguel',v:1200,d:10},
+{n:'⚡ Energia',v:150,d:15},
+{n:'💧 Água',v:80,d:12},
+{n:'📱 Celular',v:50,d:8},
+{n:'📡 Internet',v:100,d:10},
+{n:'🛒 Supermercado',v:600,d:5},
+{n:'🚌 Transporte',v:200,d:1},
+{n:'💊 Farmácia',v:50,d:15}
+]}};
+gY(cy);
+sv();
+}
+render();
+}
+
+function gM(y,m){
+var p=ip(y,m);var r={r:[],e:[]};
+D.rc.r.forEach(function(t){r.r.push({id:nid(),n:t.n,v:t.v,d:t.d,rc:1,p:p?1:0})});
+D.rc.e.forEach(function(t){r.e.push({id:nid(),n:t.n,v:t.v,d:t.d,rc:1,p:p?1:0})});
+return r;
+}
+
+function gY(y){for(var m=1;m<=12;m++){var k=mk(y,m);if(!D.mo[k])D.mo[k]=gM(y,m)}}
+
+function render(){rYrs();rML();rCh();rSm();rCt()}
+
+function rYrs(){
+var h='';
+D.yrs.sort(function(a,b){return a-b});
+D.yrs.forEach(function(y){h+='<button class="yr-btn'+(y===D.vy?' act':'')+'" onclick="sY('+y+')">'+y+'</button>'});
+h+='<button class="yr-add" onclick="openY(\'add\')">+</button>';
+h+='<button class="yr-del" onclick="openY(\'del\')">🗑️</button>';
+document.getElementById('yrNav').innerHTML=h;
+}
+
+function rML(){document.getElementById('moLbl').textContent=MF[D.vm-1]+' '+D.vy}
+
+function rCh(){
+var y=D.vy,bs=[],mx=1;
+for(var m=1;m<=12;m++){var k=mk(y,m);var mo=D.mo[k];var b=0;if(mo){var tr=0,te=0;mo.r.forEach(function(i){tr+=i.v});mo.e.forEach(function(i){te+=i.v});b=tr-te}bs.push(b);if(Math.abs(b)>mx)mx=Math.abs(b)}
+var now=new Date();var curM=(y===now.getFullYear())?now.getMonth()+1:-1;
+var h='';
+for(var m=1;m<=12;m++){
+var b=bs[m-1],p=ip(y,m),c=(m===curM),f=!p&&!c;
+var ht=Math.abs(b)/mx*28;if(ht<2&&b!==0)ht=2;
+var cl=(b>=0?'bar-g':'bar-r')+(f?' bar-proj':'')+(c?' bar-cur':'');
+var ev=EV[y+'-'+m]||'';
+h+='<div class="chart-col" onclick="goM('+m+')">';
+h+='<div class="chart-evt">'+ev+'</div>';
+h+='<div class="chart-top">';if(b>=0)h+='<div class="chart-bar '+cl+'" style="height:'+ht+'px"></div>';h+='</div>';
+h+='<div class="chart-line"></div>';
+h+='<div class="chart-bot">';if(b<0)h+='<div class="chart-bar '+cl+'" style="height:'+ht+'px"></div>';h+='</div>';
+h+='<div class="chart-lbl'+(m===D.vm?' style="font-weight:700;color:#1a1a2e"':'')+'">'+MC[m-1]+'</div>';
+h+='</div>';
+}
+document.getElementById('ch').innerHTML=h;
+document.getElementById('chTtl').textContent='📈 Projeção '+y;
+var tot=bs.reduce(function(s,b){return s+b},0);
+var gn=bs.filter(function(b){return b>=0}).length;
+var rn=bs.filter(function(b){return b<0}).length;
+var tc=tot>=0?'color:#27ae60':'color:#e74c3c';
+document.getElementById('chRes').innerHTML='🟢 '+gn+' positivos · 🔴 '+rn+' negativos · Ano: <b style="'+tc+'">'+fmt(tot)+'</b>';
+}
+
+function rSm(){
+var k=mk(D.vy,D.vm);var mo=D.mo[k];
+if(!mo){document.getElementById('summ').innerHTML='';return}
+var tr=0,te=0,tp=0,tpn=0;
+mo.r.forEach(function(i){tr+=i.v});
+mo.e.forEach(function(i){te+=i.v;if(i.p)tp+=i.v;else tpn+=i.v});
+var rm=tr-te;var pct=tr>0?te/tr*100:0;
+var rc,rb,rt;
+if(rm>500){rc='color:#27ae60';rb='background:#e8f5e9';rt=''}
+else if(rm>=0){rc='color:#f39c12';rb='background:#fff8e1';rt='🟡 Apertado'}
+else{rc='color:#e74c3c';rb='background:#fce4ec';rt='🔴 Estourou!'}
+var al='';
+if(pct>=100)al='<div class="summ-alert" style="background:#fce4ec;color:#e74c3c">🚨 Gastando mais do que ganha!</div>';
+else if(pct>=95)al='<div class="summ-alert" style="background:#fce4ec;color:#e74c3c">🔴 PERIGO: 95%+ comprometida</div>';
+else if(pct>=85)al='<div class="summ-alert" style="background:#fff3e0;color:#e67e22">🟠 Cuidado: 85%+ gasta</div>';
+else if(pct>=70)al='<div class="summ-alert" style="background:#fff8e1;color:#f39c12">🟡 Atenção: 70%+ comprometida</div>';
+else if(pct>=50)al='<div class="summ-alert" style="background:#e8f5e9;color:#27ae60">🟢 Metade da renda usada</div>';
+var h='<div class="summ-row">';
+h+='<div class="summ-card"><div class="lb">💵 Receita</div><div class="vl" style="color:#27ae60">'+fmt(tr)+'</div></div>';
+h+='<div class="summ-card"><div class="lb">📋 Total Contas</div><div class="vl" style="color:#e74c3c">'+fmt(te)+'</div></div>';
+h+='</div><div class="summ-row">';
+h+='<div class="summ-card"><div class="lb">✅ Pago</div><div class="vl">'+fmt(tp)+'</div></div>';
+h+='<div class="summ-card"><div class="lb">⏳ Pendente</div><div class="vl">'+fmt(tpn)+'</div></div>';
+h+='</div>';
+h+='<div class="summ-rem" style="'+rb+';'+rc+'"><div class="lb" style="color:inherit">Sobra do Mês</div><div class="rv">'+fmt(rm)+'</div>';
+if(rt)h+='<div style="font-size:11px;margin-top:2px">'+rt+'</div>';
+h+='</div>'+al;
+document.getElementById('summ').innerHTML=h;
+}
+
+function rCt(){
+var k=mk(D.vy,D.vm);var mo=D.mo[k];
+if(!mo){document.getElementById('content').innerHTML='<div style="padding:20px;text-align:center;color:#aaa">Nenhum dado</div>';return}
+var h='';
+var rP=mo.r.filter(function(i){return !i.p}).sort(function(a,b){return a.d-b.d});
+var rD=mo.r.filter(function(i){return i.p}).sort(function(a,b){return a.d-b.d});
+h+='<div class="sec"><div class="sec-t">💵 RECEITAS</div>';
+rP.forEach(function(i){h+=rI(i,'r',0)});
+if(rD.length){if(rP.length)h+='<div class="sep">✅ Recebidas</div>';rD.forEach(function(i){h+=rI(i,'r',1)})}
+h+='</div>';
+var eP=mo.e.filter(function(i){return !i.p}).sort(function(a,b){return a.d-b.d});
+var eD=mo.e.filter(function(i){return i.p}).sort(function(a,b){return a.d-b.d});
+h+='<div class="sec"><div class="sec-t">📋 CONTAS DO MÊS</div>';
+eP.forEach(function(i){h+=rI(i,'e',0)});
+if(eD.length){if(eP.length)h+='<div class="sep">✅ Pagas</div>';eD.forEach(function(i){h+=rI(i,'e',1)})}
+h+='</div>';
+document.getElementById('content').innerHTML=h;
+}
+
+function rI(it,tp,dn){
+var cls=dn?'item dn':'item';
+var vc=tp==='r'?'ival ig':'ival ir';
+var px=tp==='r'?'+':'-';
+var h='<div class="'+cls+'">';
+h+='<div class="ichk'+(it.p?' on':'')+'" onclick="tP('+it.id+',\''+tp+'\')">✓</div>';
+h+='<div class="iinf"><div class="iname">'+it.n+'</div>';
+h+='<div class="idet">Dia '+it.d+(it.rc?' · 🔄 Recorrente':'')+'</div></div>';
+h+='<div class="'+vc+'">'+px+fmt(it.v)+'</div>';
+h+='<div class="iact"><button onclick="oE('+it.id+',\''+tp+'\')">✏️</button></div>';
+h+='</div>';return h;
+}
+
+function tP(id,tp){
+var k=mk(D.vy,D.vm);var mo=D.mo[k];if(!mo)return;
+var ar=tp==='r'?mo.r:mo.e;
+var it=ar.find(function(i){return i.id===id});
+if(it){it.p=it.p?0:1;sv();render()}
+}
+
+function goM(m){D.vm=m;sv();render();window.scrollTo(0,0)}
+function prevMonth(){D.vm--;if(D.vm<1){D.vm=12;D.vy--;if(D.yrs.indexOf(D.vy)<0){D.yrs.push(D.vy);gY(D.vy)}}sv();render()}
+function nextMonth(){D.vm++;if(D.vm>12){D.vm=1;D.vy++;if(D.yrs.indexOf(D.vy)<0){D.yrs.push(D.vy);gY(D.vy)}}sv();render()}
+function sY(y){D.vy=y;sv();render()}
+
+function openModal(tp){
+mType=tp;eId=null;
+document.getElementById('mTtl').textContent=tp==='r'?'Nova Receita':'Nova Conta';
+document.getElementById('mNm').value='';document.getElementById('mVl').value='';document.getElementById('mDy').value='';
+document.getElementById('mRec').classList.remove('on');
+document.getElementById('bDel').style.display='none';
+document.getElementById('mBg').classList.add('show');
+}
+
+function oE(id,tp){
+mType=tp;eId=id;
+var k=mk(D.vy,D.vm);var mo=D.mo[k];
+var ar=tp==='r'?mo.r:mo.e;
+var it=ar.find(function(i){return i.id===id});if(!it)return;
+document.getElementById('mTtl').textContent='Editar '+(tp==='r'?'Receita':'Conta');
+document.getElementById('mNm').value=it.n;
+document.getElementById('mVl').value=it.v;
+document.getElementById('mDy').value=it.d;
+var tg=document.getElementById('mRec');if(it.rc)tg.classList.add('on');else tg.classList.remove('on');
+document.getElementById('bDel').style.display='block';
+document.getElementById('mBg').classList.add('show');
+}
+
+function closeM(){document.getElementById('mBg').classList.remove('show')}
+
+function saveM(){
+var nm=document.getElementById('mNm').value.trim();
+var vl=parseFloat(document.getElementById('mVl').value);
+var dy=parseInt(document.getElementById('mDy').value);
+var rc=document.getElementById('mRec').classList.contains('on')?1:0;
+if(!nm||isNaN(vl)||isNaN(dy)||dy<1||dy>31){alert('Preencha todos os campos');return}
+var k=mk(D.vy,D.vm);if(!D.mo[k])D.mo[k]=gM(D.vy,D.vm);
+var mo=D.mo[k];var ar=mType==='r'?mo.r:mo.e;
+if(eId!==null){var it=ar.find(function(i){return i.id===eId});if(it){it.n=nm;it.v=vl;it.d=dy;it.rc=rc}}
+else{ar.push({id:nid(),n:nm,v:vl,d:dy,rc:rc,p:0});if(rc){var ta=mType==='r'?D.rc.r:D.rc.e;ta.push({n:nm,v:vl,d:dy})}}
+sv();closeM();render();
+}
+
+function delItem(){
+if(eId===null)return;
+cFn=function(){
+var k=mk(D.vy,D.vm);var mo=D.mo[k];
+if(mType==='r')mo.r=mo.r.filter(function(i){return i.id!==eId});
+else mo.e=mo.e.filter(function(i){return i.id!==eId});
+sv();closeM();closeC();render();
+};
+document.getElementById('cMsg').textContent='Excluir este item?';
+document.getElementById('cBg').classList.add('show');
+}
+
+function openY(mode){
+yMode=mode;
+document.getElementById('yTtl').textContent=mode==='add'?'➕ Adicionar Ano':'🗑️ Excluir Ano';
+document.getElementById('yLbl').textContent=mode==='add'?'Qual ano?':'Qual ano excluir?';
+document.getElementById('yInp').value='';
+var btn=document.getElementById('yBtn');
+btn.textContent=mode==='add'?'Adicionar':'Excluir';
+btn.style.background=mode==='add'?'#1a1a2e':'#e74c3c';
+document.getElementById('yBg').classList.add('show');
+}
+
+function closeY(){document.getElementById('yBg').classList.remove('show')}
+
+function confirmY(){
+var y=parseInt(document.getElementById('yInp').value);
+if(isNaN(y)||y<2020||y>2050){alert('Ano inválido');return}
+if(yMode==='add'){
+if(D.yrs.indexOf(y)>=0){alert('Já existe');return}
+D.yrs.push(y);gY(y);D.vy=y;D.vm=1;sv();closeY();render();
+}else{
+if(D.yrs.length<=1){alert('Precisa ter pelo menos 1 ano');return}
+if(D.yrs.indexOf(y)<0){alert('Não encontrado');return}
+cFn=function(){
+D.yrs=D.yrs.filter(function(a){return a!==y});
+for(var m=1;m<=12;m++)delete D.mo[mk(y,m)];
+if(D.vy===y){D.vy=D.yrs[0];D.vm=1}
+sv();closeY();closeC();render();
+};
+document.getElementById('cMsg').textContent='Excluir '+y+' e todos os dados?';
+document.getElementById('cBg').classList.add('show');
+}
+}
+
+function closeC(){document.getElementById('cBg').classList.remove('show');cFn=null}
+function execC(){if(cFn)cFn()}
+
+function openPdf(){document.getElementById('pBg').classList.add('show')}
+function closePdf(){document.getElementById('pBg').classList.remove('show')}
+
+function genPdf(type){
+closePdf();
+var w=window.open('','_blank');
+if(!w){alert('Permita pop-ups');return}
+var css='body{font-family:-apple-system,Arial,sans-serif;padding:20px;color:#1a1a2e;max-width:600px;margin:0 auto}h1{text-align:center;font-size:20px;margin-bottom:5px}h2{font-size:16px;margin:15px 0 8px;padding-bottom:4px;border-bottom:2px solid #1a1a2e}h3{font-size:14px;margin:12px 0 6px}.sub{text-align:center;color:#888;font-size:12px;margin-bottom:15px}table{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:13px}td{padding:5px 8px;border-bottom:1px solid #eee}td:last-child{text-align:right;font-weight:600}.green{color:#27ae60}.red{color:#e74c3c}.yellow{color:#f39c12}.box{padding:12px;border-radius:6px;text-align:center;margin:10px 0;font-weight:700;font-size:16px}.bg{background:#e8f5e9}.by{background:#fff8e1}.br{background:#fce4ec}.ft{text-align:center;font-size:10px;color:#aaa;margin-top:20px;border-top:1px solid #eee;padding-top:10px}';
+var html='<html><head><meta charset="UTF-8"><title>FinConsult</title><style>'+css+'</style></head><body>';
+html+='<h1>💰 FINCONSULT</h1>';
+var now=new Date();var ts=now.toLocaleDateString('pt-BR')+' às '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+if(type==='month'){html+=monthHtml(D.vy,D.vm)}
+else{
+html+='<div class="sub">Resumo Anual — '+D.vy+'</div>';
+var ytR=0,ytE=0;
+for(var m=1;m<=12;m++){var k=mk(D.vy,m);var mo=D.mo[k];if(mo){var tr=0,te=0;mo.r.forEach(function(i){tr+=i.v});mo.e.forEach(function(i){te+=i.v});ytR+=tr;ytE+=te}}
+var ytB=ytR-ytE;var yc=ytB>=0?'bg':'br';
+html+='<div class="box '+yc+'"><span style="font-size:12px">Resultado do Ano</span><br>'+fmt(ytB)+'</div>';
+for(var m=1;m<=12;m++){html+='<div style="page-break-inside:avoid">'+monthHtml(D.vy,m)+'</div>'}
+}
+html+='<div class="ft">Gerado em '+ts+'</div>';
+html+='<script>setTimeout(function(){window.print()},500)<\/script>';
+html+='</body></html>';
+w.document.write(html);w.document.close();
+}
+
+function monthHtml(y,m){
+var k=mk(y,m);var mo=D.mo[k];
+var h='<h2>📅 '+MF[m-1]+'/'+y+'</h2>';
+if(!mo){h+='<p style="color:#aaa">Sem dados</p>';return h}
+var tr=0,te=0,tp=0,tpn=0;
+mo.r.forEach(function(i){tr+=i.v});
+mo.e.forEach(function(i){te+=i.v;if(i.p)tp+=i.v;else tpn+=i.v});
+var rm=tr-te;
+var bc=rm>500?'bg':(rm>=0?'by':'br');var tc=rm>500?'green':(rm>=0?'yellow':'red');
+h+='<table><td>💵 Receita</td><td class="green">'+fmt(tr)+'</td></table>';
+h+='<table><td>📋 Total Contas</td><td class="red">'+fmt(te)+'</td></table>';
+h+='<table><td>✅ Pago</td><td>'+fmt(tp)+'</td></table>';
+h+='<table><td>⏳ Pendente</td><td>'+fmt(tpn)+'</td></table>';
+h+='<div class="box '+bc+'"><span style="font-size:11px">Sobra</span><br><span class="'+tc+'">'+fmt(rm)+'</span></div>';
+h+='<h3>💵 Receitas</h3><table>';
+mo.r.sort(function(a,b){return a.d-b.d}).forEach(function(i){h+='<tr><td>'+(i.p?'✅':'⬜')+' '+i.n+' <span style="color:#aaa;font-size:10px">(dia '+i.d+')</span></td><td class="green">+'+fmt(i.v)+'</td></tr>'});
+h+='</table><h3>📋 Contas</h3><table>';
+mo.e.sort(function(a,b){return a.d-b.d}).forEach(function(i){h+='<tr><td>'+(i.p?'✅':'⬜')+' '+i.n+' <span style="color:#aaa;font-size:10px">(dia '+i.d+')</span></td><td class="red">-'+fmt(i.v)+'</td></tr>'});
+h+='</table>';
+return h;
+}
+
+init();
+</script>
+</body>
+</html>
